@@ -126,6 +126,18 @@ export default function CardDetail({ card, onClose }: CardDetailProps) {
             </button>
           )}
 
+          {/* Gyroscope active indicator */}
+          {gyro.active && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/20 border border-accent/40 text-accent-foreground text-xs font-medium animate-fade-in">
+              <Smartphone size={14} className="animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]" />
+              <span>Gyroscope Active</span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+              </span>
+            </div>
+          )}
+
           {/* Card name */}
           <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">{card.name}</h2>
 
