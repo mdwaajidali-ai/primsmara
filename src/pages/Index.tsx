@@ -32,7 +32,7 @@ const SORT_LABELS: Record<SortOption, string> = {
 };
 
 export default function Index() {
-  const { user, profile } = useAuthContext();
+  const { user, profile, fetchProfile } = useAuthContext();
   const { collection, ownsCard, addCards } = useCollection(user?.id);
   const { decks, createDeck, saveDeck } = useDecks(user?.id);
 
