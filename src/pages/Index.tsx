@@ -128,7 +128,7 @@ export default function Index() {
                 key={el}
                 onClick={() => setElementFilter(el === elementFilter ? 'all' : el)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-body font-semibold transition-all ${elementFilter === el ? 'text-foreground ring-2' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
-                style={elementFilter === el ? { backgroundColor: `${ELEMENT_COLORS[el]}20`, ringColor: ELEMENT_COLORS[el], boxShadow: `0 0 0 2px ${ELEMENT_COLORS[el]}` } : undefined}
+                style={elementFilter === el ? { backgroundColor: `${ELEMENT_COLORS[el]}20`, boxShadow: `0 0 0 2px ${ELEMENT_COLORS[el]}` } : undefined}
               >
                 <ElementIcon element={el} size={14} style={{ color: ELEMENT_COLORS[el] }} />
                 <span className="capitalize hidden sm:inline">{el}</span>
