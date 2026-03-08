@@ -6,7 +6,8 @@ import CardDetail from '@/components/CardDetail';
 import PackOpening from '@/components/PackOpening';
 import DeckBuilder from '@/components/DeckBuilder';
 import { ElementIcon } from '@/components/ElementIcon';
-import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown } from 'lucide-react';
+import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight } from 'lucide-react';
+import CardComparison from '@/components/CardComparison';
 import { toast } from 'sonner';
 
 const ELEMENTS: Element[] = ['fire', 'water', 'earth', 'air', 'light', 'dark'];
@@ -38,8 +39,26 @@ export default function Index() {
   const [deck, setDeck] = useState<Card[]>([]);
   const [deckOpen, setDeckOpen] = useState(false);
   const MAX_DECK_SIZE = 10;
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareCards, setCompareCards] = useState<[Card | null, Card | null]>([null, null]);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   const handleCardClick = useCallback((card: Card) => {
+    if (compareMode) {
+      setCompareCards(prev => {
+        if (prev[0]?.id === card.id || prev[1]?.id === card.id) {
+          toast.info('Card already selected for comparison', { duration: 1500 });
+          return prev;
+        }
+        if (!prev[0]) return [card, prev[1]];
+        if (!prev[1]) {
+          setTimeout(() => setCompareOpen(true), 200);
+          return [prev[0], card];
+        }
+        return [card, prev[1]];
+      });
+      return;
+    }
     if (deck.find(c => c.id === card.id)) {
       setSelectedCard(card);
       return;
@@ -51,7 +70,27 @@ export default function Index() {
     }
     setDeck(prev => [...prev, card]);
     toast.success(`${card.name} added to deck!`, { duration: 1500 });
-  }, [deck]);
+  }, [deck, compareMode]);
+
+  const handleToggleCompare = useCallback(() => {
+    setCompareMode(prev => {
+      if (prev) {
+        setCompareCards([null, null]);
+        setCompareOpen(false);
+      } else {
+        toast.info('Click two cards to compare them', { duration: 2000 });
+      }
+      return !prev;
+    });
+  }, []);
+
+  const handleClearCompareSlot = useCallback((index: 0 | 1) => {
+    setCompareCards(prev => {
+      const next: [Card | null, Card | null] = [...prev];
+      next[index] = null;
+      return next;
+    });
+  }, []);
 
   const handleRemoveFromDeck = useCallback((cardId: number) => {
     setDeck(prev => prev.filter(c => c.id !== cardId));
@@ -126,6 +165,13 @@ export default function Index() {
           </div>
           <div className="flex items-center gap-3">
             <button
+              onClick={handleToggleCompare}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg font-display font-semibold text-sm transition-all ${compareMode ? 'bg-primary text-primary-foreground ring-2 ring-primary/50' : 'bg-secondary hover:bg-secondary/80 text-foreground'}`}
+            >
+              <ArrowLeftRight size={18} />
+              <span className="hidden sm:inline">Compare</span>
+            </button>
+            <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
             >
@@ -141,6 +187,30 @@ export default function Index() {
             </button>
           </div>
         </div>
+
+        {/* Compare mode banner */}
+        <AnimatePresence>
+          {compareMode && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-4 px-4 py-3 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-between"
+            >
+              <span className="text-sm font-body text-foreground">
+                <strong>Compare Mode:</strong> Select {!compareCards[0] ? 'first' : 'second'} card to compare
+              </span>
+              {(compareCards[0] || compareCards[1]) && (
+                <button
+                  onClick={() => setCompareOpen(true)}
+                  className="text-sm font-display font-semibold text-primary hover:underline"
+                >
+                  View Comparison
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Filters */}
         <div className="flex flex-col gap-4 mb-6">
@@ -300,6 +370,14 @@ export default function Index() {
         isOpen={deckOpen}
         onToggle={() => setDeckOpen(!deckOpen)}
         maxSize={MAX_DECK_SIZE}
+      />
+
+      {/* Card Comparison */}
+      <CardComparison
+        cards={compareCards}
+        isOpen={compareOpen}
+        onClose={() => setCompareOpen(false)}
+        onClearSlot={handleClearCompareSlot}
       />
 
       {/* Pack opening */}
