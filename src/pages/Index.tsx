@@ -261,9 +261,9 @@ export default function Index() {
                   >
                     <HoloCard
                       card={card}
-                      onClick={() => setSelectedCard(card)}
+                      onClick={() => handleCardClick(card)}
                       flipDelay={i * 50}
-                      highlighted={highlightedIds.includes(card.id)}
+                      highlighted={highlightedIds.includes(card.id) || deck.some(d => d.id === card.id)}
                     />
                   </motion.div>
                 ))
