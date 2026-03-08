@@ -35,6 +35,32 @@ export default function Index() {
   const [loaded, setLoaded] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const [deck, setDeck] = useState<Card[]>([]);
+  const [deckOpen, setDeckOpen] = useState(false);
+  const MAX_DECK_SIZE = 10;
+
+  const handleCardClick = useCallback((card: Card) => {
+    if (deck.find(c => c.id === card.id)) {
+      setSelectedCard(card);
+      return;
+    }
+    if (deck.length >= MAX_DECK_SIZE) {
+      toast.error('Deck is full! Remove a card first.', { duration: 2000 });
+      setSelectedCard(card);
+      return;
+    }
+    setDeck(prev => [...prev, card]);
+    toast.success(`${card.name} added to deck!`, { duration: 1500 });
+  }, [deck]);
+
+  const handleRemoveFromDeck = useCallback((cardId: number) => {
+    setDeck(prev => prev.filter(c => c.id !== cardId));
+  }, []);
+
+  const handleClearDeck = useCallback(() => {
+    setDeck([]);
+    toast.info('Deck cleared', { duration: 1500 });
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 800);
