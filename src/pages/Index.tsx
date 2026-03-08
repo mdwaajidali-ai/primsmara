@@ -53,6 +53,20 @@ export default function Index() {
   const [compareCards, setCompareCards] = useState<[Card | null, Card | null]>([null, null]);
   const [compareOpen, setCompareOpen] = useState(false);
   const [showOwned, setShowOwned] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
+
+  const handleSpendGold = useCallback(async (amount: number) => {
+    if (!user || !profile) return false;
+    const newGold = profile.gold - amount;
+    if (newGold < 0) return false;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ gold: newGold })
+      .eq('user_id', user.id);
+    if (error) return false;
+    await fetchProfile(user.id);
+    return true;
+  }, [user, profile, fetchProfile]);
 
   const handleCardClick = useCallback((card: Card) => {
     if (compareMode) {
