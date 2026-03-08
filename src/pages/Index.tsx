@@ -479,6 +479,18 @@ export default function Index() {
       <AnimatePresence>
         <PackOpening isOpen={packOpen} onClose={handlePackClose} soundEnabled={soundEnabled} />
       </AnimatePresence>
+
+      {/* Card Shop */}
+      <AnimatePresence>
+        <CardShop
+          isOpen={shopOpen}
+          onClose={() => setShopOpen(false)}
+          gold={profile?.gold ?? 0}
+          onSpendGold={handleSpendGold}
+          onAddCards={addCards}
+          ownsCard={ownsCard}
+        />
+      </AnimatePresence>
     </div>
   );
 }
