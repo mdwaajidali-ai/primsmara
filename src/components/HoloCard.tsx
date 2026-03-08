@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Card, RARITY_COLORS, RARITY_STARS } from '@/data/cards';
-import { ElementIcon } from './ElementIcon';
+import { CARD_IMAGES } from '@/data/cardImages';
 import { Star, Swords, Shield } from 'lucide-react';
 import { useCardTilt } from '@/hooks/useCardTilt';
 
