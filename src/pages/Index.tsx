@@ -39,6 +39,9 @@ export default function Index() {
   const [deck, setDeck] = useState<Card[]>([]);
   const [deckOpen, setDeckOpen] = useState(false);
   const MAX_DECK_SIZE = 10;
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareCards, setCompareCards] = useState<[Card | null, Card | null]>([null, null]);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   const handleCardClick = useCallback((card: Card) => {
     if (deck.find(c => c.id === card.id)) {
