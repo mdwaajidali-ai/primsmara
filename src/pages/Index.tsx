@@ -6,7 +6,8 @@ import CardDetail from '@/components/CardDetail';
 import PackOpening from '@/components/PackOpening';
 import DeckBuilder from '@/components/DeckBuilder';
 import { ElementIcon } from '@/components/ElementIcon';
-import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown } from 'lucide-react';
+import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight } from 'lucide-react';
+import CardComparison from '@/components/CardComparison';
 import { toast } from 'sonner';
 
 const ELEMENTS: Element[] = ['fire', 'water', 'earth', 'air', 'light', 'dark'];
