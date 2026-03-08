@@ -532,6 +532,17 @@ export default function Index() {
           ownsCard={ownsCard}
         />
       </AnimatePresence>
+
+      {/* Battle Arena */}
+      <AnimatePresence>
+        <BattleArena
+          isOpen={battleOpen}
+          onClose={() => setBattleOpen(false)}
+          playerDeck={deck}
+          playerLevel={profile?.level ?? 1}
+          onBattleEnd={handleBattleEnd}
+        />
+      </AnimatePresence>
     </div>
   );
 }
