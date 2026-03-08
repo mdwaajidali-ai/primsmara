@@ -1,23 +1,75 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, RARITY_COLORS, RARITY_STARS } from '@/data/cards';
 import { ElementIcon } from './ElementIcon';
 import { CARD_IMAGES } from '@/data/cardImages';
-import { Star, Swords, Shield, X } from 'lucide-react';
+import { Star, Swords, Shield, X, Smartphone } from 'lucide-react';
 
 interface CardDetailProps {
   card: Card | null;
   onClose: () => void;
 }
 
+function useGyroscope() {
+  const [gyro, setGyro] = useState<{ rotateX: number; rotateY: number; active: boolean }>({ rotateX: 0, rotateY: 0, active: false });
+  const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'unavailable'>('prompt');
+  const isMobile = useRef(false);
+
+  useEffect(() => {
+    isMobile.current = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 768;
+    if (!isMobile.current || !('DeviceOrientationEvent' in window)) {
+      setPermissionState('unavailable');
+    }
+  }, []);
+
+  const requestPermission = useCallback(async () => {
+    try {
+      const DOE = DeviceOrientationEvent as any;
+      if (typeof DOE.requestPermission === 'function') {
+        const result = await DOE.requestPermission();
+        if (result === 'granted') {
+          setPermissionState('granted');
+        } else {
+          setPermissionState('denied');
+        }
+      } else {
+        // Non-iOS, permission not needed
+        setPermissionState('granted');
+      }
+    } catch {
+      setPermissionState('denied');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (permissionState !== 'granted') return;
+
+    const handler = (e: DeviceOrientationEvent) => {
+      const beta = e.beta ?? 0;   // front/back tilt (-180..180)
+      const gamma = e.gamma ?? 0; // left/right tilt (-90..90)
+      const rotateX = Math.max(-15, Math.min(15, beta - 45));
+      const rotateY = Math.max(-15, Math.min(15, gamma));
+      setGyro({ rotateX, rotateY, active: true });
+    };
+
+    window.addEventListener('deviceorientation', handler);
+    return () => window.removeEventListener('deviceorientation', handler);
+  }, [permissionState]);
+
+  return { gyro, permissionState, requestPermission, isMobile: isMobile.current };
+}
+
 export default function CardDetail({ card, onClose }: CardDetailProps) {
   const [time, setTime] = useState(0);
+  const { gyro, permissionState, requestPermission, isMobile } = useGyroscope();
 
   useEffect(() => {
     if (!card) return;
+    // Only run auto-rotation timer if gyroscope is not active
+    if (gyro.active) return;
     const interval = setInterval(() => setTime(t => t + 16), 16);
     return () => clearInterval(interval);
-  }, [card]);
+  }, [card, gyro.active]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') onClose();
@@ -30,20 +82,25 @@ export default function CardDetail({ card, onClose }: CardDetailProps) {
 
   if (!card) return null;
 
-  const rotateY = Math.sin(time / 2000) * 12;
-  const rotateX = Math.cos(time / 3000) * 5;
-  const foilAngle = (time / 30) % 360;
-  const bgPosX = 50 + Math.sin(time / 2000) * 30;
-  const bgPosY = 50 + Math.cos(time / 3000) * 30;
-  const lightX = 50 + Math.sin(time / 1500) * 40;
-  const lightY = 50 + Math.cos(time / 2500) * 40;
+  // Use gyroscope values when active, otherwise use auto-rotation
+  const rotateY = gyro.active ? gyro.rotateY : Math.sin(time / 2000) * 12;
+  const rotateX = gyro.active ? gyro.rotateX : Math.cos(time / 3000) * 5;
+
+  // Derive foil/light positions from tilt
+  const foilAngle = gyro.active
+    ? Math.atan2(gyro.rotateX, gyro.rotateY) * (180 / Math.PI)
+    : (time / 30) % 360;
+  const bgPosX = gyro.active ? 50 + (gyro.rotateY / 15) * 30 : 50 + Math.sin(time / 2000) * 30;
+  const bgPosY = gyro.active ? 50 + (gyro.rotateX / 15) * 30 : 50 + Math.cos(time / 3000) * 30;
+  const lightX = gyro.active ? 50 + (gyro.rotateY / 15) * 40 : 50 + Math.sin(time / 1500) * 40;
+  const lightY = gyro.active ? 50 + (gyro.rotateX / 15) * 40 : 50 + Math.cos(time / 2500) * 40;
 
   const rarityIdx = { common: 0, uncommon: 1, rare: 2, legendary: 3, mythic: 4 }[card.rarity];
   const foilOpacity = [0.1, 0.15, 0.2, 0.3, 0.4][rarityIdx];
   const blendMode = card.rarity === 'mythic' ? 'hard-light' : 'color-dodge';
   const sparkleCount = card.rarity === 'rare' ? 8 : card.rarity === 'legendary' ? 18 : card.rarity === 'mythic' ? 30 : 0;
 
-  const CARD_W = 375;
+  const CARD_W = isMobile ? 280 : 375;
   const CARD_H = CARD_W * (3.5 / 2.5);
 
   return (
@@ -58,8 +115,19 @@ export default function CardDetail({ card, onClose }: CardDetailProps) {
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
         <div className="relative z-10 flex flex-col items-center gap-4" onClick={e => e.stopPropagation()}>
+          {/* Gyroscope permission button */}
+          {isMobile && permissionState === 'prompt' && (
+            <button
+              onClick={requestPermission}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium animate-pulse"
+            >
+              <Smartphone size={16} />
+              Enable Tilt
+            </button>
+          )}
+
           {/* Card name */}
-          <h2 className="font-display text-3xl font-bold text-foreground">{card.name}</h2>
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">{card.name}</h2>
 
           {/* Element + rarity badges */}
           <div className="flex items-center gap-4">
@@ -76,11 +144,11 @@ export default function CardDetail({ card, onClose }: CardDetailProps) {
           </div>
 
           {/* Card + stats */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 md:gap-8">
             {/* ATK */}
             <div className="flex flex-col items-center gap-1">
-              <Swords size={32} style={{ color: '#F87171' }} />
-              <span className="font-display text-3xl font-bold text-foreground">{card.attack}</span>
+              <Swords size={isMobile ? 24 : 32} style={{ color: '#F87171' }} />
+              <span className="font-display text-2xl md:text-3xl font-bold text-foreground">{card.attack}</span>
               <span className="text-xs text-muted-foreground uppercase tracking-wider">Attack</span>
             </div>
 
@@ -91,6 +159,7 @@ export default function CardDetail({ card, onClose }: CardDetailProps) {
                 style={{
                   transformStyle: 'preserve-3d',
                   transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+                  transition: gyro.active ? 'transform 100ms ease-out' : undefined,
                   border: card.rarity === 'mythic' ? undefined : `3px solid ${card.elementColor}`,
                   boxShadow: `0 0 25px ${card.elementColor}60`,
                 }}
@@ -169,14 +238,14 @@ export default function CardDetail({ card, onClose }: CardDetailProps) {
 
             {/* DEF */}
             <div className="flex flex-col items-center gap-1">
-              <Shield size={32} style={{ color: '#60A5FA' }} />
-              <span className="font-display text-3xl font-bold text-foreground">{card.defense}</span>
+              <Shield size={isMobile ? 24 : 32} style={{ color: '#60A5FA' }} />
+              <span className="font-display text-2xl md:text-3xl font-bold text-foreground">{card.defense}</span>
               <span className="text-xs text-muted-foreground uppercase tracking-wider">Defense</span>
             </div>
           </div>
 
           {/* Description */}
-          <p className="max-w-md text-center text-muted-foreground mt-2">{card.description}</p>
+          <p className="max-w-md text-center text-muted-foreground mt-2 px-4">{card.description}</p>
 
           {/* Close */}
           <button onClick={onClose} className="mt-4 p-2 rounded-full bg-secondary hover:bg-secondary/80 transition-colors">
