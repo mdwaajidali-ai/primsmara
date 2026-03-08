@@ -5,6 +5,17 @@ import { CARD_IMAGES } from '@/data/cardImages';
 import { PACK_TIERS, CARD_PRICES, PackTier, rollPackCards } from '@/data/shop';
 import { ElementIcon } from '@/components/ElementIcon';
 import { X, Coins, Package, Star, Swords, Shield, ShoppingBag, Sparkles, Lock, Check } from 'lucide-react';
+import basicPackImg from '@/assets/packs/basic-pack.png';
+import premiumPackImg from '@/assets/packs/premium-pack.png';
+import legendaryPackImg from '@/assets/packs/legendary-pack.png';
+import mythicPackImg from '@/assets/packs/mythic-pack.png';
+
+const PACK_IMAGES: Record<string, string> = {
+  basic: basicPackImg,
+  premium: premiumPackImg,
+  legendary: legendaryPackImg,
+  mythic: mythicPackImg,
+};
 import { toast } from 'sonner';
 
 interface CardShopProps {
