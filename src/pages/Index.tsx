@@ -55,6 +55,7 @@ export default function Index() {
   const [compareOpen, setCompareOpen] = useState(false);
   const [showOwned, setShowOwned] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [battleOpen, setBattleOpen] = useState(false);
 
   const handleSpendGold = useCallback(async (amount: number) => {
     if (!user || !profile) return false;
