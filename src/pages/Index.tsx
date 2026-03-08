@@ -292,6 +292,16 @@ export default function Index() {
         {selectedCard && <CardDetail card={selectedCard} onClose={() => setSelectedCard(null)} />}
       </AnimatePresence>
 
+      {/* Deck Builder */}
+      <DeckBuilder
+        deck={deck}
+        onRemove={handleRemoveFromDeck}
+        onClear={handleClearDeck}
+        isOpen={deckOpen}
+        onToggle={() => setDeckOpen(!deckOpen)}
+        maxSize={MAX_DECK_SIZE}
+      />
+
       {/* Pack opening */}
       <AnimatePresence>
         <PackOpening isOpen={packOpen} onClose={handlePackClose} soundEnabled={soundEnabled} />
