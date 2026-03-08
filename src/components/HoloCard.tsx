@@ -102,14 +102,23 @@ export default function HoloCard({ card, onClick, flipDelay = 0, isFlipped = tru
             <div className="absolute -inset-[3px] rounded-xl mythic-shimmer pointer-events-none" style={{ zIndex: -1 }} />
           )}
 
-          {/* Card background */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(220 20% 12%), hsl(220 25% 5%))' }} />
+          {/* Card art background */}
+          <div className="absolute inset-0">
+            <img
+              src={CARD_IMAGES[card.id]}
+              alt={card.name}
+              className="w-full h-full object-cover"
+              draggable={false}
+            />
+            {/* Dark gradient overlay for text readability */}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.8) 85%)' }} />
+          </div>
 
           {/* Content */}
           <div className="relative z-[5] flex flex-col h-full p-4">
             {/* Top: name + rarity */}
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-display text-sm font-bold text-foreground truncate mr-2">{card.name}</h3>
+              <h3 className="font-display text-sm font-bold text-foreground truncate mr-2 drop-shadow-md">{card.name}</h3>
               <div className="flex gap-0.5 flex-shrink-0">
                 {Array.from({ length: RARITY_STARS[card.rarity] }).map((_, i) => (
                   <Star key={i} size={12} fill={RARITY_COLORS[card.rarity]} color={RARITY_COLORS[card.rarity]} />
@@ -117,34 +126,19 @@ export default function HoloCard({ card, onClick, flipDelay = 0, isFlipped = tru
               </div>
             </div>
 
-            {/* Center: character image */}
-            <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-              <div
-                className="absolute inset-0 rounded-lg"
-                style={{
-                  background: `radial-gradient(circle, ${card.elementColor}18 0%, transparent 70%)`,
-                }}
-              />
-              <div style={{ animation: isLegendary || isMythic ? 'iconPulse 2s ease-in-out infinite' : undefined }}>
-                <img
-                  src={CARD_IMAGES[card.id]}
-                  alt={card.name}
-                  className="h-[120px] w-[120px] object-contain drop-shadow-lg"
-                  draggable={false}
-                />
-              </div>
-            </div>
+            {/* Spacer for full art */}
+            <div className="flex-1" />
 
             {/* Bottom: stats */}
-            <div className="flex items-center justify-center gap-4 mt-2 pt-2 border-t border-foreground/10">
+            <div className="flex items-center justify-center gap-4 mt-2 pt-2 border-t border-foreground/20 backdrop-blur-sm bg-black/30 -mx-4 px-4 -mb-4 pb-3 rounded-b-xl">
               <div className="flex items-center gap-1.5">
                 <Swords size={16} style={{ color: '#F87171' }} />
-                <span className="font-display font-bold text-sm text-foreground">{card.attack}</span>
+                <span className="font-display font-bold text-sm text-foreground drop-shadow-md">{card.attack}</span>
               </div>
-              <div className="w-px h-5 bg-foreground/20" />
+              <div className="w-px h-5 bg-foreground/30" />
               <div className="flex items-center gap-1.5">
                 <Shield size={16} style={{ color: '#60A5FA' }} />
-                <span className="font-display font-bold text-sm text-foreground">{card.defense}</span>
+                <span className="font-display font-bold text-sm text-foreground drop-shadow-md">{card.defense}</span>
               </div>
             </div>
           </div>
