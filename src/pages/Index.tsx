@@ -1,11 +1,13 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cards, Card, Element, Rarity, ELEMENT_COLORS, RARITY_COLORS, RARITY_ORDER, RARITY_STARS } from '@/data/cards';
 import HoloCard from '@/components/HoloCard';
 import CardDetail from '@/components/CardDetail';
 import PackOpening from '@/components/PackOpening';
+import DeckBuilder from '@/components/DeckBuilder';
 import { ElementIcon } from '@/components/ElementIcon';
 import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
 
 const ELEMENTS: Element[] = ['fire', 'water', 'earth', 'air', 'light', 'dark'];
 const RARITIES: Rarity[] = ['common', 'uncommon', 'rare', 'legendary', 'mythic'];
