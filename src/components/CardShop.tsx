@@ -197,11 +197,11 @@ export default function CardShop({ isOpen, onClose, gold, onSpendGold, onAddCard
                     >
                       {/* Pack visual */}
                       <div
-                        className="h-36 flex items-center justify-center relative overflow-hidden"
-                        style={{ background: tier.gradient, boxShadow: `inset 0 -20px 40px rgba(0,0,0,0.3)` }}
+                        className="h-40 relative overflow-hidden"
+                        style={{ boxShadow: `inset 0 -20px 40px rgba(0,0,0,0.3)` }}
                       >
-                        <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.15), transparent 60%)` }} />
-                        <Package size={48} className="text-foreground/80 drop-shadow-lg" />
+                        <img src={PACK_IMAGES[tier.id]} alt={tier.name} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%)' }} />
                         <div className="absolute bottom-2 left-0 right-0 text-center">
                           <span className="font-display text-xs font-bold text-foreground/70 drop-shadow-md">{tier.cardCount} Cards</span>
                         </div>
