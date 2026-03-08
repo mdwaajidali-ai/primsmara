@@ -1,11 +1,13 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cards, Card, Element, Rarity, ELEMENT_COLORS, RARITY_COLORS, RARITY_ORDER, RARITY_STARS } from '@/data/cards';
 import HoloCard from '@/components/HoloCard';
 import CardDetail from '@/components/CardDetail';
 import PackOpening from '@/components/PackOpening';
+import DeckBuilder from '@/components/DeckBuilder';
 import { ElementIcon } from '@/components/ElementIcon';
 import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
 
 const ELEMENTS: Element[] = ['fire', 'water', 'earth', 'air', 'light', 'dark'];
 const RARITIES: Rarity[] = ['common', 'uncommon', 'rare', 'legendary', 'mythic'];
@@ -33,6 +35,32 @@ export default function Index() {
   const [loaded, setLoaded] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const [deck, setDeck] = useState<Card[]>([]);
+  const [deckOpen, setDeckOpen] = useState(false);
+  const MAX_DECK_SIZE = 10;
+
+  const handleCardClick = useCallback((card: Card) => {
+    if (deck.find(c => c.id === card.id)) {
+      setSelectedCard(card);
+      return;
+    }
+    if (deck.length >= MAX_DECK_SIZE) {
+      toast.error('Deck is full! Remove a card first.', { duration: 2000 });
+      setSelectedCard(card);
+      return;
+    }
+    setDeck(prev => [...prev, card]);
+    toast.success(`${card.name} added to deck!`, { duration: 1500 });
+  }, [deck]);
+
+  const handleRemoveFromDeck = useCallback((cardId: number) => {
+    setDeck(prev => prev.filter(c => c.id !== cardId));
+  }, []);
+
+  const handleClearDeck = useCallback(() => {
+    setDeck([]);
+    toast.info('Deck cleared', { duration: 1500 });
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 800);
@@ -233,9 +261,9 @@ export default function Index() {
                   >
                     <HoloCard
                       card={card}
-                      onClick={() => setSelectedCard(card)}
+                      onClick={() => handleCardClick(card)}
                       flipDelay={i * 50}
-                      highlighted={highlightedIds.includes(card.id)}
+                      highlighted={highlightedIds.includes(card.id) || deck.some(d => d.id === card.id)}
                     />
                   </motion.div>
                 ))
@@ -263,6 +291,16 @@ export default function Index() {
       <AnimatePresence>
         {selectedCard && <CardDetail card={selectedCard} onClose={() => setSelectedCard(null)} />}
       </AnimatePresence>
+
+      {/* Deck Builder */}
+      <DeckBuilder
+        deck={deck}
+        onRemove={handleRemoveFromDeck}
+        onClear={handleClearDeck}
+        isOpen={deckOpen}
+        onToggle={() => setDeckOpen(!deckOpen)}
+        maxSize={MAX_DECK_SIZE}
+      />
 
       {/* Pack opening */}
       <AnimatePresence>
