@@ -151,6 +151,37 @@ export default function Index() {
     }
   }, [deck, decks, saveDeck, createDeck]);
 
+  const handleStartBattle = useCallback(() => {
+    if (deck.length < 3) {
+      toast.error('You need at least 3 cards in your deck to battle!');
+      return;
+    }
+    setBattleOpen(true);
+  }, [deck]);
+
+  const handleBattleEnd = useCallback(async (won: boolean) => {
+    if (!user || !profile) return;
+    const xpGain = won ? 50 : 10;
+    const goldGain = won ? 100 : 0;
+    const updates: Record<string, number> = {
+      xp: profile.xp + xpGain,
+      gold: profile.gold + goldGain,
+    };
+    if (won) updates.wins = profile.wins + 1;
+    else updates.losses = profile.losses + 1;
+
+    // Level up check (every 100 XP)
+    const newXp = profile.xp + xpGain;
+    const newLevel = Math.floor(newXp / 100) + 1;
+    if (newLevel > profile.level) {
+      updates.level = newLevel;
+      toast.success(`Level Up! You are now level ${newLevel}!`);
+    }
+
+    await supabase.from('profiles').update(updates).eq('user_id', user.id);
+    await fetchProfile(user.id);
+  }, [user, profile, fetchProfile]);
+
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 800);
     return () => clearTimeout(t);
