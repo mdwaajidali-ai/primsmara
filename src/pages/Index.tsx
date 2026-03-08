@@ -165,6 +165,13 @@ export default function Index() {
           </div>
           <div className="flex items-center gap-3">
             <button
+              onClick={handleToggleCompare}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg font-display font-semibold text-sm transition-all ${compareMode ? 'bg-primary text-primary-foreground ring-2 ring-primary/50' : 'bg-secondary hover:bg-secondary/80 text-foreground'}`}
+            >
+              <ArrowLeftRight size={18} />
+              <span className="hidden sm:inline">Compare</span>
+            </button>
+            <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
             >
@@ -180,6 +187,30 @@ export default function Index() {
             </button>
           </div>
         </div>
+
+        {/* Compare mode banner */}
+        <AnimatePresence>
+          {compareMode && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-4 px-4 py-3 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-between"
+            >
+              <span className="text-sm font-body text-foreground">
+                <strong>Compare Mode:</strong> Select {!compareCards[0] ? 'first' : 'second'} card to compare
+              </span>
+              {(compareCards[0] || compareCards[1]) && (
+                <button
+                  onClick={() => setCompareOpen(true)}
+                  className="text-sm font-display font-semibold text-primary hover:underline"
+                >
+                  View Comparison
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Filters */}
         <div className="flex flex-col gap-4 mb-6">
