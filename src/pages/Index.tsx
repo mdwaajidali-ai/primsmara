@@ -7,7 +7,9 @@ import PackOpening from '@/components/PackOpening';
 import DeckBuilder from '@/components/DeckBuilder';
 import PlayerHeader from '@/components/PlayerHeader';
 import { ElementIcon } from '@/components/ElementIcon';
-import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight, Lock } from 'lucide-react';
+import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight, Lock, ShoppingBag } from 'lucide-react';
+import CardShop from '@/components/CardShop';
+import { supabase } from '@/integrations/supabase/client';
 import CardComparison from '@/components/CardComparison';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -30,7 +32,7 @@ const SORT_LABELS: Record<SortOption, string> = {
 };
 
 export default function Index() {
-  const { user, profile } = useAuthContext();
+  const { user, profile, fetchProfile } = useAuthContext();
   const { collection, ownsCard, addCards } = useCollection(user?.id);
   const { decks, createDeck, saveDeck } = useDecks(user?.id);
 
@@ -51,6 +53,20 @@ export default function Index() {
   const [compareCards, setCompareCards] = useState<[Card | null, Card | null]>([null, null]);
   const [compareOpen, setCompareOpen] = useState(false);
   const [showOwned, setShowOwned] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
+
+  const handleSpendGold = useCallback(async (amount: number) => {
+    if (!user || !profile) return false;
+    const newGold = profile.gold - amount;
+    if (newGold < 0) return false;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ gold: newGold })
+      .eq('user_id', user.id);
+    if (error) return false;
+    await fetchProfile(user.id);
+    return true;
+  }, [user, profile, fetchProfile]);
 
   const handleCardClick = useCallback((card: Card) => {
     if (compareMode) {
@@ -234,6 +250,14 @@ export default function Index() {
             >
               <Package size={20} />
               Open Pack
+            </button>
+            <button
+              onClick={() => setShopOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 font-display font-bold text-primary-foreground rounded-lg relative overflow-hidden shine-sweep"
+              style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
+            >
+              <ShoppingBag size={20} />
+              Shop
             </button>
             {deck.length > 0 && (
               <button
@@ -454,6 +478,18 @@ export default function Index() {
       {/* Pack opening */}
       <AnimatePresence>
         <PackOpening isOpen={packOpen} onClose={handlePackClose} soundEnabled={soundEnabled} />
+      </AnimatePresence>
+
+      {/* Card Shop */}
+      <AnimatePresence>
+        <CardShop
+          isOpen={shopOpen}
+          onClose={() => setShopOpen(false)}
+          gold={profile?.gold ?? 0}
+          onSpendGold={handleSpendGold}
+          onAddCards={addCards}
+          ownsCard={ownsCard}
+        />
       </AnimatePresence>
     </div>
   );
