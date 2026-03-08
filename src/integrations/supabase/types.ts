@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_logins: {
+        Row: {
+          created_at: string
+          gold_earned: number
+          id: string
+          login_date: string
+          streak: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          gold_earned?: number
+          id?: string
+          login_date?: string
+          streak?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          gold_earned?: number
+          id?: string
+          login_date?: string
+          streak?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       deck_cards: {
         Row: {
           card_id: number
@@ -42,6 +69,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      player_achievements: {
+        Row: {
+          achievement_id: string
+          gold_claimed: boolean
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          gold_claimed?: boolean
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          gold_claimed?: boolean
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       player_collections: {
         Row: {
