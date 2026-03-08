@@ -355,7 +355,6 @@ export default function Index() {
                 <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
               )}
             </button>
-            </button>
             {deck.length > 0 && (
               <button
                 onClick={handleSaveDeck}
