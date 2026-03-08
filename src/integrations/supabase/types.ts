@@ -14,7 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      deck_cards: {
+        Row: {
+          card_id: number
+          deck_id: string
+          id: string
+          position: number
+        }
+        Insert: {
+          card_id: number
+          deck_id: string
+          id?: string
+          position?: number
+        }
+        Update: {
+          card_id?: number
+          deck_id?: string
+          id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_cards_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "player_decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_collections: {
+        Row: {
+          acquired_at: string
+          card_id: number
+          id: string
+          quantity: number
+          user_id: string
+        }
+        Insert: {
+          acquired_at?: string
+          card_id: number
+          id?: string
+          quantity?: number
+          user_id: string
+        }
+        Update: {
+          acquired_at?: string
+          card_id?: number
+          id?: string
+          quantity?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      player_decks: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          gold: number
+          id: string
+          level: number
+          losses: number
+          updated_at: string
+          user_id: string
+          username: string
+          wins: number
+          xp: number
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          gold?: number
+          id?: string
+          level?: number
+          losses?: number
+          updated_at?: string
+          user_id: string
+          username: string
+          wins?: number
+          xp?: number
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          gold?: number
+          id?: string
+          level?: number
+          losses?: number
+          updated_at?: string
+          user_id?: string
+          username?: string
+          wins?: number
+          xp?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
