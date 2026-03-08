@@ -7,15 +7,18 @@ import PackOpening from '@/components/PackOpening';
 import DeckBuilder from '@/components/DeckBuilder';
 import PlayerHeader from '@/components/PlayerHeader';
 import { ElementIcon } from '@/components/ElementIcon';
-import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight, Lock, ShoppingBag, Swords } from 'lucide-react';
+import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight, Lock, ShoppingBag, Swords, Gift } from 'lucide-react';
 import BattleArena from '@/components/BattleArena';
 import CardShop from '@/components/CardShop';
+import RewardsPanel from '@/components/RewardsPanel';
 import { supabase } from '@/integrations/supabase/client';
 import CardComparison from '@/components/CardComparison';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCollection } from '@/hooks/useCollection';
 import { useDecks } from '@/hooks/useDecks';
+import { useRewards } from '@/hooks/useRewards';
+import { AchievementStats } from '@/data/achievements';
 
 const ELEMENTS: Element[] = ['fire', 'water', 'earth', 'air', 'light', 'dark'];
 const RARITIES: Rarity[] = ['common', 'uncommon', 'rare', 'legendary', 'mythic'];
@@ -36,6 +39,7 @@ export default function Index() {
   const { user, profile, fetchProfile } = useAuthContext();
   const { collection, ownsCard, addCards } = useCollection(user?.id);
   const { decks, createDeck, saveDeck } = useDecks(user?.id);
+  const { dailyLogin, claimDailyLogin, unlockedAchievements, checkAndUnlockAchievements, claimAchievementGold, refetchRewards } = useRewards(user?.id);
 
   const [elementFilter, setElementFilter] = useState<Element | 'all'>('all');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'all'>('all');
@@ -56,6 +60,46 @@ export default function Index() {
   const [showOwned, setShowOwned] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [battleOpen, setBattleOpen] = useState(false);
+  const [rewardsOpen, setRewardsOpen] = useState(false);
+
+  const achievementStats: AchievementStats = {
+    totalCards: collection.reduce((sum, c) => sum + c.quantity, 0),
+    uniqueCards: collection.length,
+    totalWins: profile?.wins ?? 0,
+    totalLosses: profile?.losses ?? 0,
+    totalBattles: (profile?.wins ?? 0) + (profile?.losses ?? 0),
+    level: profile?.level ?? 1,
+    gold: profile?.gold ?? 0,
+    packsOpened: 0,
+    streak: dailyLogin.streak,
+  };
+
+  // Show daily login toast on load
+  useEffect(() => {
+    if (dailyLogin.canClaim && user) {
+      setTimeout(() => {
+        toast('Daily reward ready! 🎁', {
+          description: `Claim +${dailyLogin.todayReward} gold`,
+          action: { label: 'Claim', onClick: () => setRewardsOpen(true) },
+          duration: 5000,
+        });
+      }, 1500);
+    }
+  }, [dailyLogin.canClaim, user]);
+
+  // Check achievements after battles
+  useEffect(() => {
+    if (profile && user) {
+      checkAndUnlockAchievements(achievementStats).then(newIds => {
+        if (newIds.length > 0) {
+          toast.success(`${newIds.length} new achievement${newIds.length > 1 ? 's' : ''} unlocked! 🏆`, {
+            action: { label: 'View', onClick: () => setRewardsOpen(true) },
+            duration: 4000,
+          });
+        }
+      });
+    }
+  }, [profile?.wins, profile?.losses, profile?.level, collection.length]);
 
   const handleSpendGold = useCallback(async (amount: number) => {
     if (!user || !profile) return false;
@@ -300,6 +344,17 @@ export default function Index() {
               <Swords size={20} />
               Battle
             </button>
+            <button
+              onClick={() => setRewardsOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 font-display font-bold text-primary-foreground rounded-lg relative overflow-hidden shine-sweep"
+              style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
+            >
+              <Gift size={20} />
+              Rewards
+              {(dailyLogin.canClaim || unlockedAchievements.some(a => !a.gold_claimed)) && (
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+              )}
+            </button>
             {deck.length > 0 && (
               <button
                 onClick={handleSaveDeck}
@@ -541,6 +596,29 @@ export default function Index() {
           playerDeck={deck}
           playerLevel={profile?.level ?? 1}
           onBattleEnd={handleBattleEnd}
+        />
+      </AnimatePresence>
+
+      {/* Rewards Panel */}
+      <AnimatePresence>
+        <RewardsPanel
+          isOpen={rewardsOpen}
+          onClose={() => setRewardsOpen(false)}
+          dailyLogin={dailyLogin}
+          onClaimDaily={async () => {
+            const gold = await claimDailyLogin();
+            if (gold > 0 && user) await fetchProfile(user.id);
+            return gold;
+          }}
+          unlockedAchievements={unlockedAchievements}
+          onClaimAchievement={async (id) => {
+            const gold = await claimAchievementGold(id);
+            if (gold > 0 && user) await fetchProfile(user.id);
+            return gold;
+          }}
+          onRefreshProfile={() => { if (user) fetchProfile(user.id); }}
+          stats={achievementStats}
+          onCheckAchievements={checkAndUnlockAchievements}
         />
       </AnimatePresence>
     </div>
