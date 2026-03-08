@@ -1,14 +1,273 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useMemo, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cards, Card, Element, Rarity, ELEMENT_COLORS, RARITY_COLORS, RARITY_ORDER, RARITY_STARS } from '@/data/cards';
+import HoloCard from '@/components/HoloCard';
+import CardDetail from '@/components/CardDetail';
+import PackOpening from '@/components/PackOpening';
+import { ElementIcon } from '@/components/ElementIcon';
+import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown } from 'lucide-react';
 
-const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+const ELEMENTS: Element[] = ['fire', 'water', 'earth', 'air', 'light', 'dark'];
+const RARITIES: Rarity[] = ['common', 'uncommon', 'rare', 'legendary', 'mythic'];
+
+type SortOption = 'default' | 'name-asc' | 'name-desc' | 'atk' | 'def' | 'rarity-asc' | 'rarity-desc';
+
+const SORT_LABELS: Record<SortOption, string> = {
+  default: 'Default',
+  'name-asc': 'Name A-Z',
+  'name-desc': 'Name Z-A',
+  atk: 'Highest Attack',
+  def: 'Highest Defense',
+  'rarity-asc': 'Rarity ↑',
+  'rarity-desc': 'Rarity ↓',
 };
 
-export default Index;
+export default function Index() {
+  const [elementFilter, setElementFilter] = useState<Element | 'all'>('all');
+  const [rarityFilter, setRarityFilter] = useState<Rarity | 'all'>('all');
+  const [sort, setSort] = useState<SortOption>('default');
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [packOpen, setPackOpen] = useState(false);
+  const [highlightedIds, setHighlightedIds] = useState<number[]>([]);
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holo-sound') === 'true');
+  const [loaded, setLoaded] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 800);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('holo-sound', String(soundEnabled));
+  }, [soundEnabled]);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const filtered = useMemo(() => {
+    let result = [...cards];
+    if (elementFilter !== 'all') result = result.filter(c => c.element === elementFilter);
+    if (rarityFilter !== 'all') result = result.filter(c => c.rarity === rarityFilter);
+
+    switch (sort) {
+      case 'name-asc': result.sort((a, b) => a.name.localeCompare(b.name)); break;
+      case 'name-desc': result.sort((a, b) => b.name.localeCompare(a.name)); break;
+      case 'atk': result.sort((a, b) => b.attack - a.attack); break;
+      case 'def': result.sort((a, b) => b.defense - a.defense); break;
+      case 'rarity-asc': result.sort((a, b) => RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]); break;
+      case 'rarity-desc': result.sort((a, b) => RARITY_ORDER[b.rarity] - RARITY_ORDER[a.rarity]); break;
+    }
+    return result;
+  }, [elementFilter, rarityFilter, sort]);
+
+  const elementCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    ELEMENTS.forEach(e => { counts[e] = filtered.filter(c => c.element === e).length; });
+    return counts;
+  }, [filtered]);
+
+  const rarityCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    RARITIES.forEach(r => { counts[r] = filtered.filter(c => c.rarity === r).length; });
+    return counts;
+  }, [filtered]);
+
+  const handlePackClose = (revealedIds: number[]) => {
+    setPackOpen(false);
+    if (revealedIds.length) {
+      setHighlightedIds(revealedIds);
+      setTimeout(() => setHighlightedIds([]), 3000);
+    }
+  };
+
+  return (
+    <div className="min-h-screen grid-bg animate-bg-shift">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground" style={{ textShadow: '0 0 30px rgba(234,179,8,0.3)' }}>
+              HoloCards
+            </h1>
+            <p className="text-muted-foreground mt-1 font-body text-lg">Holographic Trading Card Collection</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
+            >
+              {soundEnabled ? <Volume2 size={20} className="text-foreground" /> : <VolumeX size={20} className="text-muted-foreground" />}
+            </button>
+            <button
+              onClick={() => { setPackOpen(true); if (soundEnabled) import('@/lib/sounds').then(m => m.playPopSound()); }}
+              className="flex items-center gap-2 px-5 py-2.5 font-display font-bold text-primary-foreground rounded-lg relative overflow-hidden shine-sweep"
+              style={{ background: 'linear-gradient(135deg, #EAB308, #F97316)' }}
+            >
+              <Package size={20} />
+              Open Pack
+            </button>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setElementFilter('all')}
+              className={`px-3 py-1.5 rounded-full text-sm font-body font-semibold transition-all ${elementFilter === 'all' ? 'bg-foreground/20 text-foreground ring-2 ring-foreground/30' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
+            >
+              All
+            </button>
+            {ELEMENTS.map(el => (
+              <button
+                key={el}
+                onClick={() => setElementFilter(el === elementFilter ? 'all' : el)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-body font-semibold transition-all ${elementFilter === el ? 'text-foreground ring-2' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
+                style={elementFilter === el ? { backgroundColor: `${ELEMENT_COLORS[el]}20`, boxShadow: `0 0 0 2px ${ELEMENT_COLORS[el]}` } : undefined}
+              >
+                <ElementIcon element={el} size={14} style={{ color: ELEMENT_COLORS[el] }} />
+                <span className="capitalize hidden sm:inline">{el}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setRarityFilter('all')}
+              className={`px-3 py-1.5 rounded-full text-sm font-body font-semibold transition-all ${rarityFilter === 'all' ? 'bg-foreground/20 text-foreground ring-2 ring-foreground/30' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
+            >
+              All Rarities
+            </button>
+            {RARITIES.map(r => (
+              <button
+                key={r}
+                onClick={() => setRarityFilter(r === rarityFilter ? 'all' : r)}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-body font-semibold transition-all ${rarityFilter === r ? 'text-foreground ring-2' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
+                style={rarityFilter === r ? { backgroundColor: `${RARITY_COLORS[r]}20`, boxShadow: `0 0 0 2px ${RARITY_COLORS[r]}` } : undefined}
+              >
+                <Star size={12} fill={RARITY_COLORS[r]} color={RARITY_COLORS[r]} />
+                <span className="capitalize hidden sm:inline">{r}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground font-body">Showing {filtered.length} of {cards.length} cards</span>
+            <div className="relative">
+              <button
+                onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-sm font-body text-foreground hover:bg-secondary/80 transition-colors"
+              >
+                {SORT_LABELS[sort]}
+                <ChevronDown size={14} />
+              </button>
+              {sortDropdownOpen && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-30 py-1">
+                  {(Object.keys(SORT_LABELS) as SortOption[]).map(opt => (
+                    <button
+                      key={opt}
+                      onClick={() => { setSort(opt); setSortDropdownOpen(false); }}
+                      className={`w-full text-left px-3 py-2 text-sm font-body hover:bg-secondary transition-colors ${sort === opt ? 'text-primary' : 'text-foreground'}`}
+                    >
+                      {SORT_LABELS[opt]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="flex flex-wrap items-center gap-4 mb-8 p-4 rounded-xl bg-secondary/50 border border-border">
+          <div className="flex items-center gap-2">
+            <Layers size={16} className="text-muted-foreground" />
+            <span className="font-display text-sm text-foreground">{filtered.length} / {cards.length}</span>
+          </div>
+          <div className="w-px h-6 bg-border" />
+          {ELEMENTS.map(el => (
+            <div key={el} className="flex items-center gap-1">
+              <ElementIcon element={el} size={14} style={{ color: ELEMENT_COLORS[el] }} />
+              <span className="text-xs font-body text-muted-foreground">{elementCounts[el]}</span>
+            </div>
+          ))}
+          <div className="w-px h-6 bg-border" />
+          {RARITIES.map(r => (
+            <div key={r} className="flex items-center gap-1">
+              <Star size={10} fill={RARITY_COLORS[r]} color={RARITY_COLORS[r]} />
+              <span className="text-xs font-body text-muted-foreground">{rarityCounts[r]}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Gallery */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center">
+          <AnimatePresence mode="popLayout">
+            {!loaded
+              ? Array.from({ length: 20 }).map((_, i) => (
+                  <motion.div
+                    key={`skeleton-${i}`}
+                    className="rounded-xl"
+                    style={{
+                      width: 250,
+                      height: 350,
+                      background: 'linear-gradient(180deg, hsl(220 20% 12%), hsl(220 25% 5%))',
+                      animation: 'skeletonPulse 1.5s ease-in-out infinite',
+                      animationDelay: `${i * 50}ms`,
+                    }}
+                  />
+                ))
+              : filtered.map((card, i) => (
+                  <motion.div
+                    key={card.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3, layout: { duration: 0.4 } }}
+                  >
+                    <HoloCard
+                      card={card}
+                      onClick={() => setSelectedCard(card)}
+                      flipDelay={i * 50}
+                      highlighted={highlightedIds.includes(card.id)}
+                    />
+                  </motion.div>
+                ))
+            }
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Scroll to top */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-6 right-6 p-3 rounded-full bg-secondary border border-border shadow-lg hover:bg-secondary/80 transition-colors z-40"
+          >
+            <ArrowUp size={20} className="text-foreground" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Detail view */}
+      <AnimatePresence>
+        {selectedCard && <CardDetail card={selectedCard} onClose={() => setSelectedCard(null)} />}
+      </AnimatePresence>
+
+      {/* Pack opening */}
+      <AnimatePresence>
+        <PackOpening isOpen={packOpen} onClose={handlePackClose} soundEnabled={soundEnabled} />
+      </AnimatePresence>
+    </div>
+  );
+}
