@@ -372,6 +372,14 @@ export default function Index() {
         maxSize={MAX_DECK_SIZE}
       />
 
+      {/* Card Comparison */}
+      <CardComparison
+        cards={compareCards}
+        isOpen={compareOpen}
+        onClose={() => setCompareOpen(false)}
+        onClearSlot={handleClearCompareSlot}
+      />
+
       {/* Pack opening */}
       <AnimatePresence>
         <PackOpening isOpen={packOpen} onClose={handlePackClose} soundEnabled={soundEnabled} />
