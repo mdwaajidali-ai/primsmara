@@ -60,6 +60,46 @@ export default function Index() {
   const [showOwned, setShowOwned] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [battleOpen, setBattleOpen] = useState(false);
+  const [rewardsOpen, setRewardsOpen] = useState(false);
+
+  const achievementStats: AchievementStats = {
+    totalCards: collection.reduce((sum, c) => sum + c.quantity, 0),
+    uniqueCards: collection.length,
+    totalWins: profile?.wins ?? 0,
+    totalLosses: profile?.losses ?? 0,
+    totalBattles: (profile?.wins ?? 0) + (profile?.losses ?? 0),
+    level: profile?.level ?? 1,
+    gold: profile?.gold ?? 0,
+    packsOpened: 0,
+    streak: dailyLogin.streak,
+  };
+
+  // Show daily login toast on load
+  useEffect(() => {
+    if (dailyLogin.canClaim && user) {
+      setTimeout(() => {
+        toast('Daily reward ready! 🎁', {
+          description: `Claim +${dailyLogin.todayReward} gold`,
+          action: { label: 'Claim', onClick: () => setRewardsOpen(true) },
+          duration: 5000,
+        });
+      }, 1500);
+    }
+  }, [dailyLogin.canClaim, user]);
+
+  // Check achievements after battles
+  useEffect(() => {
+    if (profile && user) {
+      checkAndUnlockAchievements(achievementStats).then(newIds => {
+        if (newIds.length > 0) {
+          toast.success(`${newIds.length} new achievement${newIds.length > 1 ? 's' : ''} unlocked! 🏆`, {
+            action: { label: 'View', onClick: () => setRewardsOpen(true) },
+            duration: 4000,
+          });
+        }
+      });
+    }
+  }, [profile?.wins, profile?.losses, profile?.level, collection.length]);
 
   const handleSpendGold = useCallback(async (amount: number) => {
     if (!user || !profile) return false;
