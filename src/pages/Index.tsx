@@ -344,6 +344,18 @@ export default function Index() {
               <Swords size={20} />
               Battle
             </button>
+            <button
+              onClick={() => setRewardsOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 font-display font-bold text-primary-foreground rounded-lg relative overflow-hidden shine-sweep"
+              style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
+            >
+              <Gift size={20} />
+              Rewards
+              {(dailyLogin.canClaim || unlockedAchievements.some(a => !a.gold_claimed)) && (
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+              )}
+            </button>
+            </button>
             {deck.length > 0 && (
               <button
                 onClick={handleSaveDeck}
