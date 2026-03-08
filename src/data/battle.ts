@@ -322,26 +322,4 @@ export function aiTurn(state: BattleState): BattleState {
   };
 }
 
-// Generate AI deck from all cards
-export function generateAIDeck(playerLevel: number): Card[] {
-  const { cards } = require('@/data/cards');
-  const allCards = [...cards] as Card[];
-
-  // Scale difficulty with player level
-  const deckSize = Math.min(10, 6 + Math.floor(playerLevel / 3));
-
-  // Weighted random selection favoring better cards at higher levels
-  const sorted = allCards.sort((a, b) => (b.attack + b.defense) - (a.attack + a.defense));
-  const pool = playerLevel <= 3
-    ? sorted.slice(Math.floor(sorted.length * 0.4)) // weaker cards for low level
-    : playerLevel <= 7
-    ? sorted.slice(Math.floor(sorted.length * 0.1))
-    : sorted; // all cards at high level
-
-  const deck: Card[] = [];
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  for (let i = 0; i < deckSize && i < shuffled.length; i++) {
-    deck.push(shuffled[i]);
-  }
-  return deck;
-}
+// generateAIDeck is now handled inline in BattleArena component
