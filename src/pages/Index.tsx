@@ -44,6 +44,21 @@ export default function Index() {
   const [compareOpen, setCompareOpen] = useState(false);
 
   const handleCardClick = useCallback((card: Card) => {
+    if (compareMode) {
+      setCompareCards(prev => {
+        if (prev[0]?.id === card.id || prev[1]?.id === card.id) {
+          toast.info('Card already selected for comparison', { duration: 1500 });
+          return prev;
+        }
+        if (!prev[0]) return [card, prev[1]];
+        if (!prev[1]) {
+          setTimeout(() => setCompareOpen(true), 200);
+          return [prev[0], card];
+        }
+        return [card, prev[1]];
+      });
+      return;
+    }
     if (deck.find(c => c.id === card.id)) {
       setSelectedCard(card);
       return;
@@ -55,7 +70,27 @@ export default function Index() {
     }
     setDeck(prev => [...prev, card]);
     toast.success(`${card.name} added to deck!`, { duration: 1500 });
-  }, [deck]);
+  }, [deck, compareMode]);
+
+  const handleToggleCompare = useCallback(() => {
+    setCompareMode(prev => {
+      if (prev) {
+        setCompareCards([null, null]);
+        setCompareOpen(false);
+      } else {
+        toast.info('Click two cards to compare them', { duration: 2000 });
+      }
+      return !prev;
+    });
+  }, []);
+
+  const handleClearCompareSlot = useCallback((index: 0 | 1) => {
+    setCompareCards(prev => {
+      const next: [Card | null, Card | null] = [...prev];
+      next[index] = null;
+      return next;
+    });
+  }, []);
 
   const handleRemoveFromDeck = useCallback((cardId: number) => {
     setDeck(prev => prev.filter(c => c.id !== cardId));
