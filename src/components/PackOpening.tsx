@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, cards, RARITY_COLORS, RARITY_STARS } from '@/data/cards';
-import { ElementIcon } from './ElementIcon';
+import { CARD_IMAGES } from '@/data/cardImages';
 import { Star, Swords, Shield, X } from 'lucide-react';
 import { playFlipSound, playShimmerSound, playFanfare } from '@/lib/sounds';
 
