@@ -7,7 +7,8 @@ import PackOpening from '@/components/PackOpening';
 import DeckBuilder from '@/components/DeckBuilder';
 import PlayerHeader from '@/components/PlayerHeader';
 import { ElementIcon } from '@/components/ElementIcon';
-import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight, Lock, ShoppingBag } from 'lucide-react';
+import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight, Lock, ShoppingBag, Swords } from 'lucide-react';
+import BattleArena from '@/components/BattleArena';
 import CardShop from '@/components/CardShop';
 import { supabase } from '@/integrations/supabase/client';
 import CardComparison from '@/components/CardComparison';
@@ -54,6 +55,7 @@ export default function Index() {
   const [compareOpen, setCompareOpen] = useState(false);
   const [showOwned, setShowOwned] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [battleOpen, setBattleOpen] = useState(false);
 
   const handleSpendGold = useCallback(async (amount: number) => {
     if (!user || !profile) return false;
@@ -148,6 +150,37 @@ export default function Index() {
       toast.success('Deck created!');
     }
   }, [deck, decks, saveDeck, createDeck]);
+
+  const handleStartBattle = useCallback(() => {
+    if (deck.length < 3) {
+      toast.error('You need at least 3 cards in your deck to battle!');
+      return;
+    }
+    setBattleOpen(true);
+  }, [deck]);
+
+  const handleBattleEnd = useCallback(async (won: boolean) => {
+    if (!user || !profile) return;
+    const xpGain = won ? 50 : 10;
+    const goldGain = won ? 100 : 0;
+    const updates: Record<string, number> = {
+      xp: profile.xp + xpGain,
+      gold: profile.gold + goldGain,
+    };
+    if (won) updates.wins = profile.wins + 1;
+    else updates.losses = profile.losses + 1;
+
+    // Level up check (every 100 XP)
+    const newXp = profile.xp + xpGain;
+    const newLevel = Math.floor(newXp / 100) + 1;
+    if (newLevel > profile.level) {
+      updates.level = newLevel;
+      toast.success(`Level Up! You are now level ${newLevel}!`);
+    }
+
+    await supabase.from('profiles').update(updates).eq('user_id', user.id);
+    await fetchProfile(user.id);
+  }, [user, profile, fetchProfile]);
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 800);
@@ -258,6 +291,14 @@ export default function Index() {
             >
               <ShoppingBag size={20} />
               Shop
+            </button>
+            <button
+              onClick={handleStartBattle}
+              className="flex items-center gap-2 px-5 py-2.5 font-display font-bold text-primary-foreground rounded-lg relative overflow-hidden shine-sweep"
+              style={{ background: 'linear-gradient(135deg, #DC2626, #EF4444)' }}
+            >
+              <Swords size={20} />
+              Battle
             </button>
             {deck.length > 0 && (
               <button
@@ -489,6 +530,17 @@ export default function Index() {
           onSpendGold={handleSpendGold}
           onAddCards={addCards}
           ownsCard={ownsCard}
+        />
+      </AnimatePresence>
+
+      {/* Battle Arena */}
+      <AnimatePresence>
+        <BattleArena
+          isOpen={battleOpen}
+          onClose={() => setBattleOpen(false)}
+          playerDeck={deck}
+          playerLevel={profile?.level ?? 1}
+          onBattleEnd={handleBattleEnd}
         />
       </AnimatePresence>
     </div>
