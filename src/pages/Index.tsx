@@ -251,6 +251,14 @@ export default function Index() {
               <Package size={20} />
               Open Pack
             </button>
+            <button
+              onClick={() => setShopOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 font-display font-bold text-primary-foreground rounded-lg relative overflow-hidden shine-sweep"
+              style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
+            >
+              <ShoppingBag size={20} />
+              Shop
+            </button>
             {deck.length > 0 && (
               <button
                 onClick={handleSaveDeck}
