@@ -292,6 +292,13 @@ export default function Index() {
               <ShoppingBag size={20} />
               Shop
             </button>
+            <button
+              onClick={handleStartBattle}
+              className="flex items-center gap-2 px-5 py-2.5 font-display font-bold text-primary-foreground rounded-lg relative overflow-hidden shine-sweep"
+              style={{ background: 'linear-gradient(135deg, #DC2626, #EF4444)' }}
+            >
+              <Swords size={20} />
+              Battle
             {deck.length > 0 && (
               <button
                 onClick={handleSaveDeck}
