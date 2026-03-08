@@ -39,6 +39,7 @@ export default function Index() {
   const { user, profile, fetchProfile } = useAuthContext();
   const { collection, ownsCard, addCards } = useCollection(user?.id);
   const { decks, createDeck, saveDeck } = useDecks(user?.id);
+  const { dailyLogin, claimDailyLogin, unlockedAchievements, checkAndUnlockAchievements, claimAchievementGold, refetchRewards } = useRewards(user?.id);
 
   const [elementFilter, setElementFilter] = useState<Element | 'all'>('all');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'all'>('all');
