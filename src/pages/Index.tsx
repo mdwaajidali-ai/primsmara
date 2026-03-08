@@ -299,6 +299,7 @@ export default function Index() {
             >
               <Swords size={20} />
               Battle
+            </button>
             {deck.length > 0 && (
               <button
                 onClick={handleSaveDeck}
