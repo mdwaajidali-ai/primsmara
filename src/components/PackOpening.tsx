@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, cards, RARITY_COLORS, RARITY_STARS } from '@/data/cards';
-import { ElementIcon } from './ElementIcon';
+import { CARD_IMAGES } from '@/data/cardImages';
 import { Star, Swords, Shield, X } from 'lucide-react';
 import { playFlipSound, playShimmerSound, playFanfare } from '@/lib/sounds';
 
@@ -185,20 +185,21 @@ export default function PackOpening({ isOpen, onClose, soundEnabled }: PackOpeni
                         boxShadow: `0 0 20px ${card.elementColor}50`,
                       }}
                     >
-                      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(220 20% 12%), hsl(220 25% 5%))' }} />
+                      <div className="absolute inset-0">
+                        <img src={CARD_IMAGES[card.id]} alt={card.name} className="w-full h-full object-cover" draggable={false} />
+                        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.8) 85%)' }} />
+                      </div>
                       <div className="relative z-[5] flex flex-col h-full p-3">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-display text-xs font-bold text-foreground truncate mr-1">{card.name}</h3>
+                          <h3 className="font-display text-xs font-bold text-foreground truncate mr-1 drop-shadow-md">{card.name}</h3>
                           <div className="flex gap-0.5 flex-shrink-0">
                             {Array.from({ length: RARITY_STARS[card.rarity] }).map((_, j) => (
                               <Star key={j} size={8} fill={RARITY_COLORS[card.rarity]} color={RARITY_COLORS[card.rarity]} />
                             ))}
                           </div>
                         </div>
-                        <div className="flex-1 flex items-center justify-center">
-                          <ElementIcon element={card.element} size={50} style={{ color: card.elementColor }} />
-                        </div>
-                        <div className="flex items-center justify-center gap-3 mt-1 pt-1 border-t border-foreground/10">
+                        <div className="flex-1" />
+                        <div className="flex items-center justify-center gap-3 mt-1 pt-1 border-t border-foreground/10 backdrop-blur-sm bg-black/30 -mx-3 px-3 -mb-3 pb-2 rounded-b-xl">
                           <div className="flex items-center gap-1">
                             <Swords size={12} style={{ color: '#F87171' }} />
                             <span className="font-display font-bold text-xs text-foreground">{card.attack}</span>
