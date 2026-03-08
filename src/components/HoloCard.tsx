@@ -133,12 +133,12 @@ export default function HoloCard({ card, onClick, flipDelay = 0, isFlipped = tru
             {/* Bottom: stats */}
             <div className="flex items-center justify-center gap-4 mt-2 pt-2 border-t border-foreground/10">
               <div className="flex items-center gap-1.5">
-                <Swords size={16} className="text-red-400" />
+                <Swords size={16} style={{ color: '#F87171' }} />
                 <span className="font-display font-bold text-sm text-foreground">{card.attack}</span>
               </div>
               <div className="w-px h-5 bg-foreground/20" />
               <div className="flex items-center gap-1.5">
-                <Shield size={16} className="text-blue-400" />
+                <Shield size={16} style={{ color: '#60A5FA' }} />
                 <span className="font-display font-bold text-sm text-foreground">{card.defense}</span>
               </div>
             </div>
