@@ -117,8 +117,8 @@ export default function HoloCard({ card, onClick, flipDelay = 0, isFlipped = tru
               </div>
             </div>
 
-            {/* Center: element icon */}
-            <div className="flex-1 flex items-center justify-center relative">
+            {/* Center: character image */}
+            <div className="flex-1 flex items-center justify-center relative overflow-hidden">
               <div
                 className="absolute inset-0 rounded-lg"
                 style={{
@@ -126,7 +126,12 @@ export default function HoloCard({ card, onClick, flipDelay = 0, isFlipped = tru
                 }}
               />
               <div style={{ animation: isLegendary || isMythic ? 'iconPulse 2s ease-in-out infinite' : undefined }}>
-                <ElementIcon element={card.element} size={80} className="drop-shadow-lg" style={{ color: card.elementColor } as any} />
+                <img
+                  src={CARD_IMAGES[card.id]}
+                  alt={card.name}
+                  className="h-[120px] w-[120px] object-contain drop-shadow-lg"
+                  draggable={false}
+                />
               </div>
             </div>
 

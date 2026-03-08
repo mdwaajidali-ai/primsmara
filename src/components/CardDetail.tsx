@@ -110,7 +110,13 @@ export default function CardDetail({ card, onClose }: CardDetailProps) {
                     </div>
                   </div>
                   <div className="flex-1 flex items-center justify-center">
-                    <ElementIcon element={card.element} size={120} style={{ color: card.elementColor, filter: 'drop-shadow(0 0 20px currentColor)' }} />
+                    <img
+                      src={CARD_IMAGES[card.id]}
+                      alt={card.name}
+                      className="h-[180px] w-[180px] object-contain"
+                      style={{ filter: 'drop-shadow(0 0 20px ' + card.elementColor + ')' }}
+                      draggable={false}
+                    />
                   </div>
                   <div className="flex items-center justify-center gap-6 mt-3 pt-3 border-t border-foreground/10">
                     <div className="flex items-center gap-2">
