@@ -598,6 +598,29 @@ export default function Index() {
           onBattleEnd={handleBattleEnd}
         />
       </AnimatePresence>
+
+      {/* Rewards Panel */}
+      <AnimatePresence>
+        <RewardsPanel
+          isOpen={rewardsOpen}
+          onClose={() => setRewardsOpen(false)}
+          dailyLogin={dailyLogin}
+          onClaimDaily={async () => {
+            const gold = await claimDailyLogin();
+            if (gold > 0 && user) await fetchProfile(user.id);
+            return gold;
+          }}
+          unlockedAchievements={unlockedAchievements}
+          onClaimAchievement={async (id) => {
+            const gold = await claimAchievementGold(id);
+            if (gold > 0 && user) await fetchProfile(user.id);
+            return gold;
+          }}
+          onRefreshProfile={() => { if (user) fetchProfile(user.id); }}
+          stats={achievementStats}
+          onCheckAchievements={checkAndUnlockAchievements}
+        />
+      </AnimatePresence>
     </div>
   );
 }
