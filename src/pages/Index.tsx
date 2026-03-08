@@ -5,10 +5,14 @@ import HoloCard from '@/components/HoloCard';
 import CardDetail from '@/components/CardDetail';
 import PackOpening from '@/components/PackOpening';
 import DeckBuilder from '@/components/DeckBuilder';
+import PlayerHeader from '@/components/PlayerHeader';
 import { ElementIcon } from '@/components/ElementIcon';
-import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight } from 'lucide-react';
+import { Star, Package, Volume2, VolumeX, ArrowUp, Layers, ChevronDown, ArrowLeftRight, Lock } from 'lucide-react';
 import CardComparison from '@/components/CardComparison';
 import { toast } from 'sonner';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useCollection } from '@/hooks/useCollection';
+import { useDecks } from '@/hooks/useDecks';
 
 const ELEMENTS: Element[] = ['fire', 'water', 'earth', 'air', 'light', 'dark'];
 const RARITIES: Rarity[] = ['common', 'uncommon', 'rare', 'legendary', 'mythic'];
@@ -26,6 +30,10 @@ const SORT_LABELS: Record<SortOption, string> = {
 };
 
 export default function Index() {
+  const { user, profile } = useAuthContext();
+  const { collection, ownsCard, addCards } = useCollection(user?.id);
+  const { decks, createDeck, saveDeck } = useDecks(user?.id);
+
   const [elementFilter, setElementFilter] = useState<Element | 'all'>('all');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'all'>('all');
   const [sort, setSort] = useState<SortOption>('default');
@@ -42,6 +50,7 @@ export default function Index() {
   const [compareMode, setCompareMode] = useState(false);
   const [compareCards, setCompareCards] = useState<[Card | null, Card | null]>([null, null]);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [showOwned, setShowOwned] = useState(false);
 
   const handleCardClick = useCallback((card: Card) => {
     if (compareMode) {
@@ -59,6 +68,13 @@ export default function Index() {
       });
       return;
     }
+
+    // Only allow adding owned cards to deck
+    if (!ownsCard(card.id)) {
+      setSelectedCard(card);
+      return;
+    }
+
     if (deck.find(c => c.id === card.id)) {
       setSelectedCard(card);
       return;
@@ -70,7 +86,7 @@ export default function Index() {
     }
     setDeck(prev => [...prev, card]);
     toast.success(`${card.name} added to deck!`, { duration: 1500 });
-  }, [deck, compareMode]);
+  }, [deck, compareMode, ownsCard]);
 
   const handleToggleCompare = useCallback(() => {
     setCompareMode(prev => {
@@ -101,6 +117,22 @@ export default function Index() {
     toast.info('Deck cleared', { duration: 1500 });
   }, []);
 
+  const handleSaveDeck = useCallback(async () => {
+    if (deck.length === 0) {
+      toast.error('Add cards to your deck first');
+      return;
+    }
+    const cardIds = deck.map(c => c.id);
+    const activeDeck = decks.find(d => d.is_active);
+    if (activeDeck) {
+      await saveDeck(activeDeck.id, cardIds);
+      toast.success('Deck saved!');
+    } else {
+      await createDeck('My Deck', cardIds);
+      toast.success('Deck created!');
+    }
+  }, [deck, decks, saveDeck, createDeck]);
+
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 800);
     return () => clearTimeout(t);
@@ -120,6 +152,7 @@ export default function Index() {
     let result = [...cards];
     if (elementFilter !== 'all') result = result.filter(c => c.element === elementFilter);
     if (rarityFilter !== 'all') result = result.filter(c => c.rarity === rarityFilter);
+    if (showOwned) result = result.filter(c => ownsCard(c.id));
 
     switch (sort) {
       case 'name-asc': result.sort((a, b) => a.name.localeCompare(b.name)); break;
@@ -130,7 +163,9 @@ export default function Index() {
       case 'rarity-desc': result.sort((a, b) => RARITY_ORDER[b.rarity] - RARITY_ORDER[a.rarity]); break;
     }
     return result;
-  }, [elementFilter, rarityFilter, sort]);
+  }, [elementFilter, rarityFilter, sort, showOwned, ownsCard]);
+
+  const ownedCount = collection.length;
 
   const elementCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -144,11 +179,13 @@ export default function Index() {
     return counts;
   }, [filtered]);
 
-  const handlePackClose = (revealedIds: number[]) => {
+  const handlePackClose = async (revealedIds: number[]) => {
     setPackOpen(false);
     if (revealedIds.length) {
+      await addCards(revealedIds);
       setHighlightedIds(revealedIds);
       setTimeout(() => setHighlightedIds([]), 3000);
+      toast.success(`${revealedIds.length} cards added to your collection!`);
     }
   };
 
@@ -156,20 +193,33 @@ export default function Index() {
     <div className="min-h-screen grid-bg animate-bg-shift">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground" style={{ textShadow: '0 0 30px rgba(234,179,8,0.3)' }}>
-              HoloCards
-            </h1>
-            <p className="text-muted-foreground mt-1 font-body text-lg">Holographic Trading Card Collection</p>
+        <div className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground" style={{ textShadow: '0 0 30px rgba(234,179,8,0.3)' }}>
+                HoloCards
+              </h1>
+              <p className="text-muted-foreground mt-1 font-body text-lg">
+                Collection: {ownedCount}/{cards.length} cards
+              </p>
+            </div>
+            <PlayerHeader />
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-3 flex-wrap">
             <button
               onClick={handleToggleCompare}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg font-display font-semibold text-sm transition-all ${compareMode ? 'bg-primary text-primary-foreground ring-2 ring-primary/50' : 'bg-secondary hover:bg-secondary/80 text-foreground'}`}
             >
               <ArrowLeftRight size={18} />
               <span className="hidden sm:inline">Compare</span>
+            </button>
+            <button
+              onClick={() => setShowOwned(!showOwned)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg font-display font-semibold text-sm transition-all ${showOwned ? 'bg-primary text-primary-foreground ring-2 ring-primary/50' : 'bg-secondary hover:bg-secondary/80 text-foreground'}`}
+            >
+              <Layers size={18} />
+              <span className="hidden sm:inline">{showOwned ? 'Owned' : 'All Cards'}</span>
             </button>
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
@@ -185,6 +235,14 @@ export default function Index() {
               <Package size={20} />
               Open Pack
             </button>
+            {deck.length > 0 && (
+              <button
+                onClick={handleSaveDeck}
+                className="flex items-center gap-2 px-4 py-2 font-display font-bold text-sm text-foreground rounded-lg bg-accent hover:bg-accent/80 transition-all"
+              >
+                Save Deck
+              </button>
+            )}
           </div>
         </div>
 
@@ -285,7 +343,7 @@ export default function Index() {
         <div className="flex flex-wrap items-center gap-4 mb-8 p-4 rounded-xl bg-secondary/50 border border-border">
           <div className="flex items-center gap-2">
             <Layers size={16} className="text-muted-foreground" />
-            <span className="font-display text-sm text-foreground">{filtered.length} / {cards.length}</span>
+            <span className="font-display text-sm text-foreground">{ownedCount} / {cards.length}</span>
           </div>
           <div className="w-px h-6 bg-border" />
           {ELEMENTS.map(el => (
@@ -320,23 +378,36 @@ export default function Index() {
                     }}
                   />
                 ))
-              : filtered.map((card, i) => (
-                  <motion.div
-                    key={card.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3, layout: { duration: 0.4 } }}
-                  >
-                    <HoloCard
-                      card={card}
-                      onClick={() => handleCardClick(card)}
-                      flipDelay={i * 50}
-                      highlighted={highlightedIds.includes(card.id) || deck.some(d => d.id === card.id)}
-                    />
-                  </motion.div>
-                ))
+              : filtered.map((card, i) => {
+                  const owned = ownsCard(card.id);
+                  return (
+                    <motion.div
+                      key={card.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.3, layout: { duration: 0.4 } }}
+                      className="relative"
+                    >
+                      <div className={!owned ? 'opacity-50 grayscale' : ''}>
+                        <HoloCard
+                          card={card}
+                          onClick={() => handleCardClick(card)}
+                          flipDelay={i * 50}
+                          highlighted={highlightedIds.includes(card.id) || deck.some(d => d.id === card.id)}
+                        />
+                      </div>
+                      {!owned && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
+                            <Lock size={24} className="text-muted-foreground" />
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })
             }
           </AnimatePresence>
         </div>
