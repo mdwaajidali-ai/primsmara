@@ -1,13 +1,16 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
-import { Swords, Shield, Flame, Zap, Star, ChevronDown, Package, Trophy, Users, Crosshair, Skull, Crown, Target, Volume2, VolumeX } from 'lucide-react';
+import { Swords, Shield, Flame, Zap, Star, ChevronDown, Package, Trophy, Users, Crosshair, Skull, Crown, Target, Volume2, VolumeX, Loader2, Box } from 'lucide-react';
 import { cards, RARITY_COLORS } from '@/data/cards';
 import { CARD_IMAGES } from '@/data/cardImages';
 
 import heroBg from '@/assets/landing/hero-bg.jpg';
 import arenaBg from '@/assets/landing/arena-bg.jpg';
 import lineupBg from '@/assets/landing/characters-lineup.jpg';
+
+// Lazy load 3D component for performance
+const Card3DShowcase = lazy(() => import('@/components/Card3DShowcase'));
 
 const FEATURED_CARDS = [18, 19, 20, 17, 13, 14, 15, 16];
 const ALL_CARDS_SORTED = [...cards].sort((a, b) => {
@@ -535,6 +538,57 @@ export default function Landing() {
 
       {/* ===================== BATTLE MARQUEE ===================== */}
       <BattleMarquee />
+
+      {/* ===================== 3D CARD SHOWCASE ===================== */}
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 grid-bg opacity-30" />
+        <FloatingParticles />
+        <EmberParticles count={15} color="hsl(var(--accent) / 0.3)" />
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <span className="font-display text-xs font-bold text-accent tracking-[0.3em] uppercase mb-4 block">
+              <Box className="inline-block mr-2 mb-1" size={14} /> Experience The Future
+            </span>
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-foreground mb-4">
+              INTERACTIVE <span className="text-primary">3D</span> SHOWCASE
+            </h2>
+            <p className="font-body text-lg text-muted-foreground max-w-2xl mx-auto">
+              Get up close with the most powerful warriors. Drag to rotate, hover to see them come alive in stunning 3D detail.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 60, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+          >
+            <Suspense
+              fallback={
+                <div className="w-full h-[600px] rounded-2xl border border-border/30 flex items-center justify-center"
+                  style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%)' }}
+                >
+                  <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-primary" size={48} />
+                    <p className="font-display text-sm text-muted-foreground uppercase tracking-wider">
+                      Loading 3D Experience...
+                    </p>
+                  </div>
+                </div>
+              }
+            >
+              <Card3DShowcase />
+            </Suspense>
+          </motion.div>
+        </div>
+      </section>
 
       {/* ===================== CHARACTER LINEUP ===================== */}
       <section id="warriors" className="relative py-24 overflow-hidden">
