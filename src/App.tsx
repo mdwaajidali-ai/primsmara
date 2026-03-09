@@ -28,10 +28,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 const AppRoutes = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/landing" element={<Landing />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/auth" element={<Auth />} />
       <Route
-        path="/"
+        path="/game"
         element={
           <ProtectedRoute>
             <Index />
