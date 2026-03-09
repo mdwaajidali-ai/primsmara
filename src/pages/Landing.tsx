@@ -91,7 +91,7 @@ function StickyNav() {
           <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Swords size={20} className="text-primary" />
-              <span className="font-display text-2xl text-foreground">HOLOCARDS</span>
+              <span className="font-display text-2xl text-foreground">PRISMARA</span>
             </div>
             <div className="hidden md:flex items-center gap-10">
               {['Warriors', 'Arena', 'Features'].map(item => (
@@ -708,7 +708,7 @@ export default function Landing() {
             className="text-center mb-16"
           >
             <h2 className="font-display text-5xl sm:text-6xl text-foreground">
-              WHY <span className="text-primary">HOLOCARDS</span>
+              WHY <span className="text-primary">PRISMARA</span>
             </h2>
           </motion.div>
 
@@ -761,9 +761,9 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Swords size={18} className="text-primary" />
-            <span className="font-display text-xl text-foreground">HOLOCARDS</span>
+            <span className="font-display text-xl text-foreground">PRISMARA</span>
           </div>
-          <p className="font-body text-xs text-muted-foreground">© 2026 HoloCards. All rights reserved.</p>
+          <p className="font-body text-xs text-muted-foreground">© 2026 Prismara. All rights reserved.</p>
         </div>
       </footer>
     </div>

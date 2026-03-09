@@ -83,7 +83,7 @@ export default function Auth() {
               className="font-display text-4xl font-bold text-foreground"
               style={{ textShadow: '0 0 30px rgba(234,179,8,0.3)' }}
             >
-              HoloCards
+              Prismara
             </h1>
           </div>
           <p className="text-muted-foreground font-body text-lg">

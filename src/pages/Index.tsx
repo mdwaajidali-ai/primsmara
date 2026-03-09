@@ -290,7 +290,7 @@ export default function Index() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground" style={{ textShadow: '0 0 30px rgba(234,179,8,0.3)' }}>
-                HoloCards
+                Prismara
               </h1>
               <p className="text-muted-foreground mt-1 font-body text-lg">
                 Collection: {ownedCount}/{cards.length} cards
