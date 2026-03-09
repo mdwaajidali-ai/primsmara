@@ -192,3 +192,152 @@
   0%, 100% { opacity: 0.3; }
   50% { opacity: 0.6; }
 }
+
+/* ======= LANDING PAGE GAME EFFECTS ======= */
+
+/* Glitch text effect */
+@keyframes glitch1 {
+  0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+  20% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 2px); }
+  40% { clip-path: inset(60% 0 10% 0); transform: translate(3px, -1px); }
+  60% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 1px); }
+  80% { clip-path: inset(10% 0 70% 0); transform: translate(2px, -2px); }
+}
+
+@keyframes glitch2 {
+  0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+  20% { clip-path: inset(50% 0 20% 0); transform: translate(3px, -2px); }
+  40% { clip-path: inset(10% 0 50% 0); transform: translate(-3px, 1px); }
+  60% { clip-path: inset(70% 0 5% 0); transform: translate(2px, 2px); }
+  80% { clip-path: inset(30% 0 40% 0); transform: translate(-2px, -1px); }
+}
+
+.glitch-text {
+  position: relative;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch-text::before {
+  color: hsl(var(--destructive));
+  animation: glitch1 3s infinite linear;
+  opacity: 0.5;
+}
+
+.glitch-text::after {
+  color: hsl(var(--holo-water));
+  animation: glitch2 3s infinite linear reverse;
+  opacity: 0.5;
+}
+
+/* Scan lines overlay */
+.scan-lines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+}
+
+/* Ember particles */
+@keyframes ember-rise {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-200px) translateX(var(--drift)) scale(0); opacity: 0; }
+}
+
+.ember {
+  animation: ember-rise var(--duration) ease-out var(--delay) infinite;
+}
+
+/* Pulse ring */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 0; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* War flash */
+@keyframes war-flash {
+  0%, 90%, 100% { opacity: 0; }
+  95% { opacity: 0.1; }
+}
+
+.war-flash {
+  animation: war-flash 4s ease-in-out infinite;
+}
+
+/* Energy bar fill */
+@keyframes energy-fill {
+  0% { width: 0%; }
+  100% { width: var(--fill); }
+}
+
+/* Rotating border */
+@keyframes border-spin {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.spinning-border {
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--destructive)), hsl(var(--accent)), hsl(var(--holo-water)), hsl(var(--primary)));
+  background-size: 200% 100%;
+  animation: border-spin 3s linear infinite;
+}
+
+/* Marquee */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-scroll {
+  animation: marquee 30s linear infinite;
+}
+
+/* Breathing glow */
+@keyframes breathing-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(234,179,8,0.1); }
+  50% { box-shadow: 0 0 60px rgba(234,179,8,0.3), 0 0 120px rgba(234,179,8,0.1); }
+}
+
+.breathing-glow {
+  animation: breathing-glow 3s ease-in-out infinite;
+}
+
+/* Typewriter cursor */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Slide up stagger */
+@keyframes slide-up-fade {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Horizontal line scan */
+@keyframes h-scan {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+.h-scan-line {
+  animation: h-scan 4s linear infinite;
+}
