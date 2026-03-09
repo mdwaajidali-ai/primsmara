@@ -2,48 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 95%;
+    --background: 225 25% 5%;
+    --foreground: 40 10% 92%;
 
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 95%;
+    --card: 225 20% 8%;
+    --card-foreground: 40 10% 92%;
 
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 95%;
+    --popover: 225 20% 8%;
+    --popover-foreground: 40 10% 92%;
 
-    --primary: 38 92% 50%;
-    --primary-foreground: 222 47% 6%;
+    --primary: 42 100% 50%;
+    --primary-foreground: 225 25% 5%;
 
-    --secondary: 222 30% 14%;
-    --secondary-foreground: 210 40% 90%;
+    --secondary: 225 15% 12%;
+    --secondary-foreground: 40 10% 85%;
 
-    --muted: 222 30% 14%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 225 15% 12%;
+    --muted-foreground: 220 10% 50%;
 
-    --accent: 270 60% 50%;
-    --accent-foreground: 210 40% 95%;
+    --accent: 280 50% 50%;
+    --accent-foreground: 40 10% 92%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 40 10% 98%;
 
-    --border: 222 30% 18%;
-    --input: 222 30% 18%;
-    --ring: 38 92% 50%;
+    --border: 225 15% 15%;
+    --input: 225 15% 15%;
+    --ring: 42 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --sidebar-background: 222 47% 6%;
-    --sidebar-foreground: 210 40% 90%;
-    --sidebar-primary: 38 92% 50%;
-    --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 222 30% 14%;
-    --sidebar-accent-foreground: 210 40% 90%;
-    --sidebar-border: 222 30% 18%;
-    --sidebar-ring: 38 92% 50%;
+    --sidebar-background: 225 25% 5%;
+    --sidebar-foreground: 40 10% 85%;
+    --sidebar-primary: 42 100% 50%;
+    --sidebar-primary-foreground: 225 25% 5%;
+    --sidebar-accent: 225 15% 12%;
+    --sidebar-accent-foreground: 40 10% 85%;
+    --sidebar-border: 225 15% 15%;
+    --sidebar-ring: 42 100% 50%;
 
     --holo-fire: 0 86% 60%;
     --holo-water: 217 91% 60%;
@@ -69,41 +69,41 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body;
-    font-family: 'Rajdhani', sans-serif;
+    @apply bg-background text-foreground;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  .font-condensed {
+    font-family: 'Barlow Condensed', sans-serif;
   }
 
   .font-body {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Barlow', sans-serif;
   }
 }
 
 /* Subtle grid background */
 .grid-bg {
   background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-/* Animated page background */
-@keyframes bgShift {
-  0%, 100% { background-color: hsl(222 47% 5%); }
-  50% { background-color: hsl(260 30% 6%); }
-}
-
-.animate-bg-shift {
-  animation: bgShift 20s ease-in-out infinite;
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
 }
 
 /* Mythic shimmer border */
@@ -120,16 +120,6 @@
   );
   background-size: 300% 300%;
   animation: mythicShimmer 3s linear infinite;
-}
-
-/* Mythic aura */
-@keyframes mythicAura {
-  0%, 100% { opacity: 0.1; transform: scale(1.05); }
-  50% { opacity: 0.2; transform: scale(1.08); }
-}
-
-.mythic-aura {
-  animation: mythicAura 3s ease-in-out infinite;
 }
 
 /* Card flip */
@@ -151,8 +141,8 @@
   left: 0;
   width: 50%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  animation: shineSweep 2s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: shineSweep 2.5s ease-in-out infinite;
 }
 
 /* Sparkle */
@@ -193,63 +183,6 @@
   50% { opacity: 0.6; }
 }
 
-/* ======= LANDING PAGE GAME EFFECTS ======= */
-
-/* Glitch text effect */
-@keyframes glitch1 {
-  0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
-  20% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 2px); }
-  40% { clip-path: inset(60% 0 10% 0); transform: translate(3px, -1px); }
-  60% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 1px); }
-  80% { clip-path: inset(10% 0 70% 0); transform: translate(2px, -2px); }
-}
-
-@keyframes glitch2 {
-  0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
-  20% { clip-path: inset(50% 0 20% 0); transform: translate(3px, -2px); }
-  40% { clip-path: inset(10% 0 50% 0); transform: translate(-3px, 1px); }
-  60% { clip-path: inset(70% 0 5% 0); transform: translate(2px, 2px); }
-  80% { clip-path: inset(30% 0 40% 0); transform: translate(-2px, -1px); }
-}
-
-.glitch-text {
-  position: relative;
-}
-
-.glitch-text::before,
-.glitch-text::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.glitch-text::before {
-  color: hsl(var(--destructive));
-  animation: glitch1 3s infinite linear;
-  opacity: 0.5;
-}
-
-.glitch-text::after {
-  color: hsl(var(--holo-water));
-  animation: glitch2 3s infinite linear reverse;
-  opacity: 0.5;
-}
-
-/* Scan lines overlay */
-.scan-lines {
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.1) 2px,
-    rgba(0, 0, 0, 0.1) 4px
-  );
-  pointer-events: none;
-}
-
 /* Ember particles */
 @keyframes ember-rise {
   0% { transform: translateY(0) translateX(0) scale(1); opacity: 1; }
@@ -261,31 +194,14 @@
   animation: ember-rise var(--duration) ease-out var(--delay) infinite;
 }
 
-/* Pulse ring */
-@keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 0.6; }
-  50% { transform: scale(1.2); opacity: 0; }
-  100% { transform: scale(0.8); opacity: 0; }
+/* Marquee */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-.pulse-ring {
-  animation: pulse-ring 2s ease-out infinite;
-}
-
-/* War flash */
-@keyframes war-flash {
-  0%, 90%, 100% { opacity: 0; }
-  95% { opacity: 0.1; }
-}
-
-.war-flash {
-  animation: war-flash 4s ease-in-out infinite;
-}
-
-/* Energy bar fill */
-@keyframes energy-fill {
-  0% { width: 0%; }
-  100% { width: var(--fill); }
+.marquee-scroll {
+  animation: marquee 40s linear infinite;
 }
 
 /* Rotating border */
@@ -300,36 +216,16 @@
   animation: border-spin 3s linear infinite;
 }
 
-/* Marquee */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.marquee-scroll {
-  animation: marquee 30s linear infinite;
-}
-
-/* Breathing glow */
-@keyframes breathing-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(234,179,8,0.1); }
-  50% { box-shadow: 0 0 60px rgba(234,179,8,0.3), 0 0 120px rgba(234,179,8,0.1); }
-}
-
-.breathing-glow {
-  animation: breathing-glow 3s ease-in-out infinite;
-}
-
-/* Typewriter cursor */
-@keyframes blink-cursor {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-/* Slide up stagger */
-@keyframes slide-up-fade {
-  0% { opacity: 0; transform: translateY(40px); }
-  100% { opacity: 1; transform: translateY(0); }
+/* Scan lines overlay — used sparingly */
+.scan-lines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.05) 2px,
+    rgba(0, 0, 0, 0.05) 4px
+  );
+  pointer-events: none;
 }
 
 /* Horizontal line scan */
@@ -340,4 +236,20 @@
 
 .h-scan-line {
   animation: h-scan 4s linear infinite;
+}
+
+/* Subtle breathing glow for important elements only */
+@keyframes breathing-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(234,179,8,0.05); }
+  50% { box-shadow: 0 0 40px rgba(234,179,8,0.15); }
+}
+
+.breathing-glow {
+  animation: breathing-glow 4s ease-in-out infinite;
+}
+
+/* Divider line with gradient fade */
+.divider-glow {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), transparent);
 }
