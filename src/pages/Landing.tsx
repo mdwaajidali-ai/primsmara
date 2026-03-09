@@ -1,13 +1,16 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
-import { Swords, Shield, Flame, Zap, Star, ChevronDown, Package, Trophy, Users, Crosshair, Skull, Crown, Target, Volume2, VolumeX } from 'lucide-react';
+import { Swords, Shield, Flame, Zap, Star, ChevronDown, Package, Trophy, Users, Crosshair, Skull, Crown, Target, Volume2, VolumeX, Loader2, Box } from 'lucide-react';
 import { cards, RARITY_COLORS } from '@/data/cards';
 import { CARD_IMAGES } from '@/data/cardImages';
 
 import heroBg from '@/assets/landing/hero-bg.jpg';
 import arenaBg from '@/assets/landing/arena-bg.jpg';
 import lineupBg from '@/assets/landing/characters-lineup.jpg';
+
+// Lazy load 3D component for performance
+const Card3DShowcase = lazy(() => import('@/components/Card3DShowcase'));
 
 const FEATURED_CARDS = [18, 19, 20, 17, 13, 14, 15, 16];
 const ALL_CARDS_SORTED = [...cards].sort((a, b) => {
