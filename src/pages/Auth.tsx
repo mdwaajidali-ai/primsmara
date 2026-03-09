@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { Flame, Mail, Lock, User, Loader2, Swords } from 'lucide-react';
+import { Flame, Mail, Lock, User, Loader2, Swords, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function Auth() {
