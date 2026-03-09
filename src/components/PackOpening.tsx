@@ -122,7 +122,7 @@ export default function PackOpening({ isOpen, onClose, soundEnabled }: PackOpeni
                 boxShadow: '0 0 40px rgba(234,179,8,0.4)',
               }}
             >
-              <span className="font-display text-3xl font-bold text-foreground drop-shadow-lg">HoloCards</span>
+              <span className="font-display text-3xl font-bold text-foreground drop-shadow-lg">Prismara</span>
             </motion.div>
           )}
         </AnimatePresence>
