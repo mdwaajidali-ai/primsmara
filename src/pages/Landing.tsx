@@ -761,9 +761,9 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Swords size={18} className="text-primary" />
-            <span className="font-display text-xl text-foreground">HOLOCARDS</span>
+            <span className="font-display text-xl text-foreground">PRISMARA</span>
           </div>
-          <p className="font-body text-xs text-muted-foreground">© 2026 HoloCards. All rights reserved.</p>
+          <p className="font-body text-xs text-muted-foreground">© 2026 Prismara. All rights reserved.</p>
         </div>
       </footer>
     </div>
