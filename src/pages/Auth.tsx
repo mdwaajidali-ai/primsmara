@@ -71,6 +71,10 @@ export default function Auth() {
         animate={{ opacity: 1, y: 0 }}
         className="relative w-full max-w-md"
       >
+        <Link to="/landing" className="inline-flex items-center gap-2 text-sm font-body text-muted-foreground hover:text-primary transition-colors mb-6">
+          <ArrowLeft size={16} />
+          Back to Homepage
+        </Link>
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-2">
