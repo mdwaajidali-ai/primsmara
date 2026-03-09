@@ -708,7 +708,7 @@ export default function Landing() {
             className="text-center mb-16"
           >
             <h2 className="font-display text-5xl sm:text-6xl text-foreground">
-              WHY <span className="text-primary">HOLOCARDS</span>
+              WHY <span className="text-primary">PRISMARA</span>
             </h2>
           </motion.div>
 
