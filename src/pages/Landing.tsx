@@ -91,7 +91,7 @@ function StickyNav() {
           <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Swords size={20} className="text-primary" />
-              <span className="font-display text-2xl text-foreground">HOLOCARDS</span>
+              <span className="font-display text-2xl text-foreground">PRISMARA</span>
             </div>
             <div className="hidden md:flex items-center gap-10">
               {['Warriors', 'Arena', 'Features'].map(item => (
